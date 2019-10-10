@@ -1,0 +1,22 @@
+version: "3"
+services:
+  nfvo:
+    image: {{harbor_port}}/emano/nfvo-bs:v2
+    hostname: nfvo
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.labels.role == nfvo]
+    volumes:
+      - "nfvo:/home/app/nfvo"
+    ports:
+      - "3006:3001"
+    networks:
+      - nfvonet
+networks:
+  nfvonet:
+volumes:
+  nfvo:
+

@@ -1,0 +1,7 @@
+harbor_port: 'images:88'
+work3: '182.10.1.167'
+master3: '182.10.1.164'
+appsrv2: '182.10.1.165'
+seqvalue: '30'
+dbsrv1: '182.10.1.168'
+

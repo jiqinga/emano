@@ -1,0 +1,15 @@
+version: "3"
+services:
+  visualizer:
+    image: {{harbor_port}}/emano/visualizer:v1
+    ports:
+      - "8092:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    networks:
+      - nfvonet
+networks:
+  nfvonet:

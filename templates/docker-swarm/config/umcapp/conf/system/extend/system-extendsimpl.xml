@@ -1,0 +1,39 @@
+<!--
+  Copyright 2016, CMCC Technologies Co., Ltd.
+ 
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+ 
+      http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
+<extensions>
+	<!-- System table name mapping System dao class -->
+	<extension-point id="org.openo.nfvo.monitor.umc.db.IUmcDao">
+		<impl type="PM_TASK" class="org.openo.nfvo.monitor.umc.db.dao.PmTaskDao"/>
+		<impl type="MONITOR_INFO" class="org.openo.nfvo.monitor.umc.db.dao.MonitorInfoDao"/>
+		<impl type="PM_TASK_THRESHOLD" class="org.openo.nfvo.monitor.umc.db.dao.PmTaskThresholdDao"/>
+		<impl type="CURRENTALARM" class="org.openo.nfvo.monitor.umc.db.dao.CurrentAlarmDao"/>
+		<impl type="DAC_INFO" class="org.openo.nfvo.monitor.umc.db.dao.DACInfoDao"/>
+		<impl type="HISTORYALARM" class="org.openo.nfvo.monitor.umc.db.dao.HistoryAlarmDao"/>
+		<impl type="EVENTALARM" class="org.openo.nfvo.monitor.umc.db.dao.EventAlarmDao"/>
+	</extension-point>
+	
+	<!-- System table name mapping System po class -->
+	<extension-point id="org.openo.nfvo.monitor.umc.db.IEntityClass">
+		<impl type="PM_TASK" class="org.openo.nfvo.monitor.umc.db.entity.PmTask"/>
+		<impl type="MONITOR_INFO" class="org.openo.nfvo.monitor.umc.db.entity.MonitorInfo"/>
+		<impl type="PM_TASK_THRESHOLD" class="org.openo.nfvo.monitor.umc.db.entity.PmTaskThreshold"/>
+		<impl type="CURRENTALARM" class="org.openo.nfvo.monitor.umc.db.entity.CurrentAlarm"/>
+		<impl type="DAC_INFO" class="org.openo.nfvo.monitor.umc.db.entity.DACInfo"/>
+		<impl type="HISTORYALARM" class="org.openo.nfvo.monitor.umc.db.entity.HistoryAlarm"/>
+		<impl type="EVENTALARM" class="org.openo.nfvo.monitor.umc.db.entity.EventAlarm"/>
+	</extension-point>
+</extensions>

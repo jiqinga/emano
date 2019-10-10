@@ -1,0 +1,4 @@
+---
+
+nfs_exports: 
+  - /emano/pkg 182.10.1.0/24(insecure,rw,sync,no_subtree_check,no_root_squash)

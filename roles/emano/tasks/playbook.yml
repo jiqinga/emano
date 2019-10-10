@@ -1,0 +1,18 @@
+---
+- name: 修改nginx.yml文件
+  template: src=nginx.yml.j2 dest=/docker-swarm/nfvo/nginx.yml
+  when: type == 'master1'
+
+- name: 分发nginx配置文件
+  template: src=default.conf.j2 dest=/emano/default.conf
+  when: type == 'web'
+
+- name: 分发zookeeper.yml文件
+  template: src=zookeeper.yml.j2 dest=/docker-swarm/alarms/zookeeper.yml 
+  when: type == 'master1'
+
+- name: 分发grafana配置文件
+  template: src=grafana.ini.j2 dest=/emano/grafana.ini
+  when: type == 'work5'
+
+ 

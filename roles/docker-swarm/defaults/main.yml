@@ -1,0 +1,8 @@
+---
+# author: lework
+
+
+swarm_advertise_addr: "{{ ansible_default_ipv4.address }}"
+swarm_node: 'master'
+swarm_master: '182.10.1.161'
+# ip address

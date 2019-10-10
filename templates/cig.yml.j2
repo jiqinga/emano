@@ -1,0 +1,70 @@
+version: "3"
+services:
+  influxdb:
+    image: {{harbor_port}}/emano/influxdb:v1
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.labels.role == db]
+    environment:
+      - PRE_CREATE_DB=cadvisor
+      - ADMIN_USER=root 
+      - INFLUXDB_INIT_PWD=root
+    ports:
+      - "8088:8083"
+      - "8086:8086"
+    volumes:
+      - influxdb:/data
+    networks:
+      - cignet
+
+  grafana:
+    image: {{harbor_port}}/emano/grafana:v1
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.labels.type == cad8]
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=123456
+      - INFLUXDB_HOST=influxdb
+      - INFLUXDB_PORT=8086
+      - INFLUXDB_NAME=cadvisor
+      - INFLUXDB_USER=root
+      - INFLUXDB_PASS=root
+    volumes:
+      - grafanadb:/var/lib/grafana
+      - grafanaconf:/usr/share/grafana
+      - /emano/grafana.ini:/etc/grafana/grafana.ini
+      - /emano/public:/usr/share/grafana/public
+    networks:
+      - cignet
+  cadvisor:
+    image: {{harbor_port}}/emano/cadvisor:v1
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.platform.os == linux]
+    command: --storage_driver=influxdb --storage_driver_db=cadvisor --storage_driver_host=influxdb:8086 --storage_driver_user=root  --storage_driver_password=root
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - cignet
+
+networks:
+  cignet:
+volumes:
+  grafanadb:
+  grafanaconf:
+  influxdb:
+

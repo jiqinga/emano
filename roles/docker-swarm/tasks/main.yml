@@ -1,0 +1,31 @@
+---
+# author: lework
+
+- name: Check for docker starts.
+  stat: path=/var/run/docker.sock
+  register: docker_stat
+  failed_when: not docker_stat.stat.exists
+
+- name: 初始化swarm集群
+  shell: "docker swarm init --advertise-addr {{ swarm_advertise_addr }}"
+  when: swarm_node == 'master'
+
+- name: 获取管理节点token
+  shell: docker swarm join-token manager | grep token
+  register: swarm_tokens_cmd
+  delegate_to: "{{ swarm_master }}"
+  when: swarm_master and swarm_node == 'master2'
+
+- name: 获取工作节点token
+  shell: docker swarm join-token worker | grep token
+  register: swarm_token_cmd
+  delegate_to: "{{ swarm_master }}"
+  when: swarm_master and swarm_node == 'node'
+
+- name: 管理节点加入集群
+  shell: "{{ swarm_tokens_cmd.stdout }}"
+  when: swarm_node == 'master2' 
+
+- name: 工作节点加入集群
+  shell: "{{ swarm_token_cmd.stdout }}"
+  when: swarm_node == 'node' and swarm_token_cmd.stdout

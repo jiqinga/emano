@@ -1,0 +1,35 @@
+version: "3"
+services:
+  pkg:
+    image: {{harbor_port}}/emano/pkg:v2
+    hostname: pkg
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.labels.role == pkg]
+    volumes:
+      - "pkg:/home/app/pkg/config"
+      - "/emano/pkg:/home/app/pkg/uploads"
+    ports:
+      - "3002:3002"
+    networks:
+      - nfvonet
+  winery:
+    image: {{harbor_port}}/emano/winery:v5
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.role == emano]
+    volumes:
+      - "winery:/win/modeldesigner"
+    ports:
+      - "8202:8202"
+    networks:
+      - nfvonet
+networks:
+  nfvonet:
+volumes:
+  pkg:
+  winery:

@@ -1,0 +1,30 @@
+version: "3"
+services:
+  postgre:
+    image: {{harbor_port}}/emano/postgresql:v1
+    environment:
+      - PG_TRUST_LOCALNET="true"
+      - PG_PASSWORD=ossadmin
+      - DB_USER=ossadmin
+      - DB_PASS=BrT3!xtb
+      - DB_NAME=nfvo,auth,packagemanager
+    volumes:
+      - /emano/postgresql:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+    entrypoint: /sbin//entrypoint.sh
+    stdin_open: true
+    tty: true
+    deploy:
+      restart_policy:
+        delay: 3s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      placement:
+        constraints: [node.labels.role == db]
+    networks:
+      - nfvonet
+networks:
+  nfvonet:
+

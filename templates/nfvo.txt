@@ -1,0 +1,9 @@
+auth.yml.j2
+elk.yml.j2
+postgres.yml.j2
+tosca.yml.j2
+cig.yml.j2
+nfvo.yml.j2
+pkg.yml.j2
+sftp.yml.j2
+visualizer.yml.j2

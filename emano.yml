@@ -1,0 +1,223 @@
+---
+- hosts: all
+  tasks:
+    - name: 关闭防火墙
+      systemd: name=firewalld state=stopped enabled=no
+    - name: 关闭selinux
+      selinux: state=disabled
+
+- hosts: websrv1
+  tasks:
+    - name: 分发ntpd.conf至时间同步服务器
+      template: src=ntp.conf.j2 dest=/etc/ntp.conf
+
+- hosts: ntp
+  tasks: 
+    - name: 同步hosts文件
+      copy: src=/etc/hosts  dest=/etc/hosts backup=yes
+    - name: 分发ntpd.conf至node节点
+      template: src=ntp.conf.node.j2 dest=/etc/ntp.conf
+
+- hosts: websrv1
+  tasks:
+    - name: 开启ntp时间服务器
+      systemd: name=ntpd state=restarted enabled=no
+
+- hosts: ntp
+  tasks:
+    - name: 关闭ntp服务
+      systemd: name=ntpd state=stopped enabled=no
+    - name: 进行ntp时间同步
+      shell: ntpdate websrv1 && hwclock --systohc
+
+- hosts: websrv1
+  tasks:
+    - name: 安装docker-machine
+      shell:  install /etc/ansible/templates/docker-machine   /usr/local/bin/docker-machine
+    - name: 拷贝docker-machine补全脚本
+      copy: >
+        src={{item}}
+        dest=/etc/bash_completion.d/{{item|basename}}
+      with_fileglob:
+        - ./templates/*.bash
+    - name: 生成ssh秘钥
+      shell: rm -rf /root/.ssh/* && ssh-keygen -t rsa -f ~/.ssh/id_rsa -N "" -q
+    - name: 分发ssh秘钥
+      shell: sshpass -p{{ansible_password}} ssh-copy-id {{item}}  -o StrictHostKeyChecking=no
+      with_items:
+        - websrv1
+        - websrv2
+        - appsrv1
+        - appsrv2
+        - imagesrv
+        - intersrv
+        - dbsrv1
+        - dbsrv2
+
+- hosts: all
+  tasks:
+    - name: 创建emano配置文件挂载目录
+      file: path=/emano  state=directory
+
+- hosts: websrv1
+  vars_files:
+    - ./roles/emano/defaults/main.yml
+  tasks:
+    - name: 解压docker-swarm
+      shell: tar -xf /etc/ansible/templates/docker-swarm.tar -C /
+    - name: 修改nfvo服务yml文件
+      template: src={{item}}  dest=/docker-swarm/nfvo/
+      with_lines:
+        - cat ./templates/nfvo.txt
+    
+- hosts: websrv1
+  tasks:
+    - name: nfvo服务j2文件改名
+      shell: cd {{item|dirname}} && mv {{item|basename}}  `ls {{item|basename}} |awk -F .j2 '{print $1}'`
+      with_fileglob:
+        - /docker-swarm/nfvo/*.j2
+
+- hosts: websrv1
+  vars_files:
+    - ./roles/emano/defaults/main.yml
+  tasks:
+    - name: 修改alarms服务yml文件
+      template: src={{item}}  dest=/docker-swarm/alarms/
+      with_lines:
+        - cat ./templates/alarms.txt
+
+- hosts: websrv1
+  tasks:
+    - name: alarms服务j2文件改名
+      shell: cd {{item|dirname}} && mv {{item|basename}}  `ls {{item|basename}} |awk -F .j2 '{print $1}'`
+      with_fileglob:
+        - /docker-swarm/alarms/*.j2
+
+
+- hosts: websrv1
+  vars:
+    swarm_node: 'master'
+  roles:
+    - docker-swarm
+
+- hosts: node
+  vars:
+    swarm_node: 'node'
+  roles:
+    - docker-swarm
+
+- hosts: all
+  vars:
+    type: 'all'
+  roles:
+    - emano
+
+- hosts: websrv1
+  vars:
+    type: 'master1'
+  roles:
+    - emano
+
+- hosts: websrv2
+  tasks:
+    - name: 创建/docker-swarm
+      file: path=/docker-swarm  state=directory 
+
+- hosts: intersrv
+  tasks:
+    - name: 分发kafak-rest挂载jar包
+      copy: src=/docker-swarm/config/kafka-rest-4.0.0.jar dest=/emano/kafka-rest-4.0.0.jar 
+    - name: 分发haproxy.cfg文件
+      copy: src=/docker-swarm/config/haproxy.cfg    dest=/emano/haproxy.cfg
+    - name: 分发umc挂载文件
+      copy: src=/docker-swarm/config/umcapp    dest=/emano/  mode=0777
+    - name: 分发dac挂载文件
+      copy: src=/docker-swarm/config/dacapp    dest=/emano/  mode=0777
+
+- hosts: web
+  vars:
+    type: 'web'
+  roles:
+    - emano
+
+- hosts: dbsrv2
+  tasks:
+    - name: 分发grafana容器public.tar
+      copy: src=/docker-swarm/config/public.tar dest=/tmp/
+    - name: 解压public.tar到挂载路径下
+      shell: tar -xf /tmp/public.tar -C /emano
+  vars:
+    type: 'work5'
+  roles:
+    - emano
+
+- hosts: appsrv1
+  tasks:
+    - name: 创建pkg目录
+      file: path=/emano/pkg  state=directory 
+
+- hosts: appsrv2
+  tasks:
+    - name: 创建postgresql目录
+      file: path=/emano/postgresql  state=directory
+
+- hosts: intersrv
+  tasks:
+    - name: 创建告警sftp目录
+      file: path=/emano/alarms-sftp  state=directory
+    - name: 分发holmes-rulemgt容器挂载文件
+      copy: src=/docker-swarm/config/rulemgt    dest=/emano/
+    - name: 分发holmes-engine容器挂载文件
+      copy: src=/docker-swarm/config/engine-d    dest=/emano/
+
+
+- hosts: appsrv1
+  vars:
+    - nfs_exports: 
+        - /emano/pkg {{ansible_default_ipv4.network}}/{{ansible_default_ipv4.netmask}}(insecure,rw,sync,no_subtree_check,no_root_squash)
+  roles:
+    - role: nfs
+
+- hosts: nfs
+  vars_files: 
+    - roles/emano/defaults/main.yml
+  tasks:
+    - name: 创建nfs-pkg目录
+      file: path=/emano/pkg  state=directory 
+    - name: 挂载nfs
+      mount: name=/emano/pkg src={{master3}}:/emano/pkg fstype=nfs state=mounted 
+
+- hosts: appsrv2
+  vars:
+    - nfs_exports:
+        - /emano/postgresql {{ansible_default_ipv4.network}}/{{ansible_default_ipv4.netmask}}(insecure,rw,sync,no_subtree_check,no_root_squash)
+  roles:
+    - role: nfs
+
+- hosts: db
+  vars_files:
+    - roles/emano/defaults/main.yml
+  tasks:
+    - name: 创建postgresql目录
+      file: path=/emano/postgresql  state=directory
+    - name: 挂载数据库共享目录
+      mount: name=/emano/postgresql src={{appsrv2}}:/emano/postgresql fstype=nfs state=mounted 
+
+
+- hosts: all
+  tasks:
+    - name: 检查nfs挂载
+      shell: mount -a
+
+- hosts: websrv1
+  tasks:
+    - name: 执行emano脚本
+      script: /etc/ansible/.emano.sh
+      ignore_errors: True
+    
+- hosts: websrv1
+  tasks:
+    - name: 添加管理节点master2
+      shell: docker node  promote websrv2
+    - name: 添加管理节点master3
+      shell: docker node  promote appsrv1

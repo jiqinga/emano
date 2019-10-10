@@ -1,0 +1,4 @@
+INFO [2019-08-16 00:33:54.303] [dw-3943] o.o.n.m.d.c.CometdServlet -  Monitored Subscribe from 59hilacbffytw1b1167shqls7d - last connect 1565915634304 ms ago for /upload/data 
+INFO [2019-08-16 00:33:54.308] [dw-3954] o.o.n.m.d.c.CometdServlet -  Monitored Subscribe from 59hilacbffytw1b1167shqls7d - last connect 1565915634309 ms ago for /upload/snmptrap 
+INFO [2019-08-16 00:42:17.932] [dw-3954] o.o.n.m.d.c.CometdServlet -  Monitored Subscribe from 61vzabprglfip4vstd5gufypq3 - last connect 1565916137933 ms ago for /upload/data 
+INFO [2019-08-16 00:42:17.934] [dw-3963] o.o.n.m.d.c.CometdServlet -  Monitored Subscribe from 61vzabprglfip4vstd5gufypq3 - last connect 1565916137935 ms ago for /upload/snmptrap 

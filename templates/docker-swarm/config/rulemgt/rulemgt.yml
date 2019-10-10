@@ -1,0 +1,70 @@
+apidescription: ZTE Holmes rule Management rest API
+
+# use the simple server factory if you only want to run on a single port
+#server:
+#  type: simple
+#  connector:
+#    type: http
+#    port: 12003
+
+server:
+  type: simple
+  rootPath:  '/openoapi/holmes-rule-mgmt/v1/*'
+  applicationContextPath: /
+  adminContextPath: /admin
+  connector:
+    type: http
+    port: 9101
+
+# Logging settings.
+logging:
+
+  # The default level of all loggers. Can be OFF, ERROR, WARN, INFO, DEBUG, TRACE, or ALL.
+  level: INFO
+
+  # Logger-specific levels.
+  loggers:
+
+    # Sets the level for 'com.example.app' to DEBUG.
+    com.example: DEBUG
+  
+  appenders:
+    - type: console
+      threshold: INFO
+      timeZone: UTC
+      logFormat: "%d{yyyy-MM-dd HH:mm:ss SSS} %-5p [%c][%t] - %m%n"
+    - type: file
+      threshold: INFO
+      logFormat: "%d{yyyy-MM-dd HH:mm:ss SSS} %-5p [%c][%t] - %m%n"
+      currentLogFilename: ../logs/fm-relation.log
+      archivedLogFilenamePattern: ../logs/zip/fm-relation-%d{yyyy-MM-dd}.log.gz
+      archivedFileCount: 7
+  #  - type: socketJson
+      threshold: INFO 
+  #    autoDiscover: false
+  #    logstashServiceName: logstash
+   #   logstashServiceVersion: v1
+
+#database
+database:
+  # driverClass: com.mysql.jdbc.Driver
+  #user: root
+  #password: rootpass
+  #url: jdbc:postgresql://postgre-alarms:5432/holmes
+  driverClass: org.postgresql.Driver
+  # the username
+  user: holmes
+  # the password
+  password: holmes
+  # the JDBC URL
+  url: jdbc:postgresql://postgre-alarms:5432/holmes
+
+  properties:
+    charSet: UTF-8
+  maxWaitForConnection: 1s
+  validationQuery: "/* MyService Health Check */ SELECT 1"
+  minSize: 8
+  maxSize: 100
+  checkConnectionWhileIdle: false
+  evictionInterval: 10s
+  minIdleTime: 1s

@@ -1,0 +1,39 @@
+#
+# Copyright 2016, CMCC Technologies Co., Ltd.
+ 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+ 
+#      http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Mapping Class: FmAlarmType
+
+alarmType:
+    - typeId: 0
+      description: i18n.fm.alarmtype.0
+    - typeId: 1
+      description: i18n.fm.alarmtype.1
+    - typeId: 2
+      description: i18n.fm.alarmtype.2
+    - typeId: 3
+      description: i18n.fm.alarmtype.3
+    - typeId: 4
+      description: i18n.fm.alarmtype.4
+    - typeId: 6
+      description: i18n.fm.alarmtype.6
+    - typeId: 7
+      description: i18n.fm.alarmtype.7
+    - typeId: 8
+      description: i18n.fm.alarmtype.8
+    - typeId: 9
+      description: i18n.fm.alarmtype.9
+    - typeId: 10
+      description: i18n.fm.alarmtype.10

@@ -1,0 +1,22 @@
+version: "3"
+services:
+  auth:
+    image: {{harbor_port}}/emano/auth:v2
+    hostname: auth
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.labels.role == nfvo]
+    volumes:
+      - "auth:/home/app/auth/config"
+    ports:
+      - "3001:3001"
+    networks:
+      - nfvonet
+networks:
+  nfvonet:
+volumes:
+  auth:
+

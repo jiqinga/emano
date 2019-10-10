@@ -1,0 +1,11 @@
+---
+- name: 修改daemon.json文件
+  template: src=daemon.json.j2 dest=/etc/docker/daemon.json
+  notify: restart docker
+  when: type == 'all' 
+
+- name: 设置主机名
+  shell: hostnamectl set-hostname {{hostname}}
+  when: type == 'all' 
+
+

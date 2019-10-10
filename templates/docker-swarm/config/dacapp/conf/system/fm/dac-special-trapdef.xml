@@ -1,0 +1,41 @@
+<!--
+  Copyright 2016, CMCC Technologies Co., Ltd.
+ 
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+ 
+      http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<?xml version="1.0" encoding="GB2312"?>
+
+<trap-mappings> 
+<!--identify trap type by bind value -->
+<!--
+		<trap-mappings> 
+			<trap-mapping> 
+				<trapOid value=""> trap oid
+					<bindOid bind-oid="" syntax=""/> 
+						bind-oid:bind value oid use to identify trap type.
+						syntax:bind value type (string,number) 
+				</trapOid> 
+				<entityOid value=""/>bind value oid use to contact alarmkey
+				<alarm-mapping> 
+					<alarmcfg alarmcode="" alarmreasoncode="" alarmseverity="" entity="10000" eventtype="1" bindsvalue=""/> 与之对应的告警相关设定配�?
+						alarmcode:
+						alarmreasoncode:  
+						alarmseverity:1 critical,2 major,3 minor,4 warning 
+						entity: use to contact alarmkey 
+						eventtype: 1 alarm,2 restore,3 notification
+						bindsvalue:bind value use to identify trap type
+			</alarm-mapping>
+			</trap-mapping> 
+		</trap-mappings>
+	-->
+</trap-mappings>

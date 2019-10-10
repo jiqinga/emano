@@ -1,0 +1,3 @@
+---
+- include: docker-swarm.yml
+- include: playbook.yml

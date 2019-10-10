@@ -1,0 +1,45 @@
+version: "3"
+services:
+  elasticsearch:
+    image: {{harbor_port}}/emano/elasticsearch:v1
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.role == emano]
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - nfvonet
+
+  logstash:
+    image: {{harbor_port}}/emano/logstash:v1
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.role == emano]
+    environment:
+      - xpack.monitoring.elasticsearch.url=http://elasticsearch:9200
+    ports:
+      - "5044:5044"
+    networks:
+      - nfvonet
+
+  kibana:
+    image: {{harbor_port}}/emano/kibana:v1
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.role == emano]
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - nfvonet
+networks:
+  nfvonet:
+                     
+

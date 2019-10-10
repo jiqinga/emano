@@ -1,0 +1,39 @@
+---
+- hosts: db
+  tasks:
+    - name: 设置nfvo库密码
+      script: /etc/ansible/.nfvopass.sh
+    - name: 设置告警库密码
+      script: /etc/ansible/.alarmspg.sh
+
+- hosts: nfvo
+  tasks:
+    - name: 初始化nfvo,auth
+      script: /etc/ansible/.nfvo.sh
+
+- hosts: imagesrv
+  tasks:
+    - name: 初始化pkg 
+      script: /etc/ansible/.pkg.sh
+
+- hosts: db
+  vars_files:
+    - ./roles/emano/defaults/main.yml
+  tasks:
+    - name: 修改nfvo，auth库序列值
+      script: /etc/ansible/.nfvopg.sh  {{seqvalue}}
+
+- hosts: websrv1
+  vars_files:
+    - ./roles/emano/defaults/main.yml
+  tasks:
+    - name: 修改influxdb数据保留策略
+      shell:  bash /etc/ansible/templates/influxdb.sh  {{dbsrv1}}
+
+- hosts: appsrv2
+  tasks:
+    - name: 拷贝数据库备份脚本
+      template: src=pgbackup.sh  dest=/root/
+    - name: 设置计划任务
+      shell: echo "30 3 * * * bash /root/pgbackup.sh" >>/var/spool/cron/root
+

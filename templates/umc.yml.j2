@@ -1,0 +1,151 @@
+version: "3"
+services:
+  alarms_sftp:
+    image: {{harbor_port}}/emano/atmoz/sftp:v1
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.labels.role == alarms]
+    volumes:
+      - "/emano/alarms-sftp:/home/foo/alarms"
+    entrypoint: "/entrypoint foo:pass:1001"
+    ports:
+      - "222:22"
+    networks:
+      - alarmsnet
+
+  umc:
+    image: {{harbor_port}}/emano/openoint/nfvo-umc:v1
+    environment:
+      - MSB_ADDR=msb:80
+      - URL_JDBC=postgre-alarms:5432
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.role == alarms]
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "/emano/umcapp:/service"
+    ports:
+      - "8503:8502"
+      - "8200:8205"
+      - "34343:34343"
+      - "163:163/udp"
+      - "165:165/udp"
+    entrypoint: /service/docker-entrypoint.sh
+    depends_on:
+      - msb
+      - postgre-alarms
+    networks:
+      - alarmsnet
+  dac:
+    image: {{harbor_port}}/emano/openoint/nfvo-dac:v1
+    environment:
+      - MSB_ADDR=msb:80
+    stdin_open: true
+    tty: true
+    deploy:
+      restart_policy:
+        delay: 3s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      placement:
+        constraints: [node.labels.role == alarms]
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "/emano/dacapp:/service"
+    ports:
+      - "8207:8206/tcp"
+    depends_on:
+      - msb
+      - umc
+      - postgre-alarms
+    networks:
+      - alarmsnet
+    depends_on:
+      - umc
+  
+  msb:
+    image: {{harbor_port}}/emano/openorchestrator/common-services-msb:v1
+    deploy:
+      replicas: 1
+      placement:
+          constraints: [node.labels.role == alarms]
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgre-alarms
+    networks:
+      - alarmsnet
+
+  postgre-alarms:
+    image: {{harbor_port}}/emano/postgresql:v1
+    environment:
+      - PG_TRUST_LOCALNET="true"
+      - DB_USER=umc
+      - DB_PASS=12%o3y#O
+      - DB_NAME=umc,holmes
+    volumes:
+      - "db-alarms:/var/lib/postgresql"
+    ports:
+      - "15432:5432"
+    entrypoint: /sbin//entrypoint.sh
+    stdin_open: true
+    tty: true
+    deploy:
+      restart_policy:
+        delay: 3s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      placement:
+        constraints: [node.labels.role == db]
+    networks:
+      - alarmsnet
+
+  holmes-engine-d-standalone:
+    image: {{harbor_port}}/emano/openorchestrator/holmes-engine-d-standalone:v2
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.role == alarms]
+    environment:
+      - MSB_ADDR=msb:80
+      - URL_JDBC=postgre-alarms:5432
+    volumes:
+      - "/emano/engine-d/conf:/service/conf"
+      - "/emano/engine-d/holmes-engine-d.jar:/service/holmes-engine-d.jar"
+      - "/emano/engine-d/instance-config.sh:/service/instance-config.sh"
+    depends_on:
+      - msb
+      - postgre-alarms
+    networks:
+      - alarmsnet
+
+  holmes-rulemgt-standalone:
+    image: {{harbor_port}}/emano/openorchestrator/holmes-rulemgt-standalone:v1
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.role == alarms]
+    environment:
+      - MSB_ADDR=msb:80
+      - URL_JDBC=postgre-alarms:5432
+    volumes:
+      - "/emano/rulemgt/rulemgt.yml:/service/conf/rulemgt.yml"
+      - "/emano/rulemgt/holmes-rulemgt.jar:/service/holmes-rulemgt.jar"
+      - "/emano/rulemgt/instance-config.sh:/service/instance-config.sh"
+    depends_on:
+      - msb
+      - postgre-alarms
+    networks:
+      - alarmsnet
+networks:
+  alarmsnet:
+volumes:
+  db-alarms:

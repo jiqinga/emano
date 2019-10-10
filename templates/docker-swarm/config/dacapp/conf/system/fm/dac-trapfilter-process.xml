@@ -1,0 +1,30 @@
+<!--
+  Copyright 2016, CMCC Technologies Co., Ltd.
+ 
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+ 
+      http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
+<Define>
+	<TrapProcessorList>
+	<!--
+		<Processor index="0" class="com.CMCC.ums.it.trap.service.processor.ItTrapStandardProcessor"/>
+		<Processor index="1" class="com.CMCC.ums.it.trap.service.processor.ItTrapBindVarProcessor"/>
+		<Processor index="2" class="com.CMCC.ums.it.trap.service.processor.ItTrapRestoreProcessor"/>
+		<Processor index="3" class="com.CMCC.ums.it.trap.service.processor.ItTrapPrivateProcessor"/>
+		<Processor index="4" class="com.CMCC.ums.it.trap.service.processor.ItTrapGeneralProcessor"/>
+	-->
+		<Processor index="0" class="org.openo.nfvo.monitor.dac.snmptrap.processor.TrapBindVarProcessor"/>
+		<Processor index="1" class="org.openo.nfvo.monitor.dac.snmptrap.processor.TrapRestoreProcessor"/>
+		<Processor index="2" class="org.openo.nfvo.monitor.dac.snmptrap.processor.TrapPrivateProcessor"/>
+	</TrapProcessorList>
+</Define>
