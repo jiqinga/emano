@@ -64,7 +64,7 @@
     - ./roles/emano/defaults/main.yml
   tasks:
     - name: 解压docker-swarm
-      shell: tar -xf /etc/ansible/templates/docker-swarm.tar -C /
+      shell: mv /etc/ansible/templates/docker-swarm /
     - name: 修改nfvo服务yml文件
       template: src={{item}}  dest=/docker-swarm/nfvo/
       with_lines:
