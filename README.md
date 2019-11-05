@@ -53,4 +53,4 @@ http://master/emano
 
 12.vim测试URL
  curl -i -X POST http://172.16.6.61（vim ip）:8001/v3/auth/tokens -H "Content-type: application/json" -d  '{"auth":{"identity":{"methods":["password"],"password":{"user":{"password":"1qaz@WSX（密码）","domain":{"id":"default"},"name":"NFVOZJGY（用户名）"}}},"scope":{"project":{"name":"NFVPEMANO（租户）","domain":{"id":"default"}}}}}'
- # 配置vim时注意厂商不要填错!
+ # 配置vim时注意厂商不要填错!!!
